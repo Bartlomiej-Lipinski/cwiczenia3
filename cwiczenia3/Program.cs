@@ -79,7 +79,7 @@ namespace Kontenery
 
     class KontenernaGaz : Kontener,IHazardNotifier
     {
-        int Pressure;
+        int Pressure { get; set; }
         
         public KontenernaGaz(int masa, int wysokosc, int WagaWlasna, int glebokosc, int maxLadownosc) : base(masa, wysokosc, WagaWlasna, glebokosc, maxLadownosc)
         {
@@ -88,8 +88,8 @@ namespace Kontenery
     }
     class KontenerChlodniczy : Kontener
     {
-        int temp;
-        TypProduktu typProdukt;
+        private int temp { get;set; }
+        private TypProduktu typProdukt { get; set; }
         
         public KontenerChlodniczy(int masa, int wysokosc, int WagaWlasna, int glebokosc, int maxLadownosc,TypProduktu typProduktu) : base(masa, wysokosc, WagaWlasna, glebokosc, maxLadownosc)
         {
@@ -112,3 +112,13 @@ namespace Kontenery
     
 }
 
+namespace kontenerowce
+{
+    class Kontenerowiec
+    {
+        private ArrayList kontenery = new ArrayList();
+        private int predkosc;
+        private int maxiloscKontenerow;
+        private int maxLadownosc;
+    }
+}
