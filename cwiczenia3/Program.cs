@@ -2,9 +2,9 @@
 
 namespace Kontenery
 {
-    class Kontener
+    abstract class Kontener
     {
-        private double masa;
+        private double masaLadunku;
         private int wysokosc;
         private double WagaWlasna;
         private int glebokosc;
@@ -12,24 +12,24 @@ namespace Kontenery
         private double maxLadownosc;
         private bool isHazardous;
 
-        public Kontener(int masa, int wysokosc, int WagaWlasna, int glebokosc , int maxLadownosc)
+        public Kontener()
         {
-            this.masa = masa;
-            this.wysokosc = wysokosc;
-            this.WagaWlasna = WagaWlasna;
-            this.glebokosc = glebokosc;
+            masaLadunku = WagaWlasna + masaLadunku ;
+            wysokosc = 3;
+            WagaWlasna = 2350;
+            glebokosc = 6;
             numerSeryjny = "KON-"+establishConType()+"-"+generateSN();
-            this.maxLadownosc = maxLadownosc;
+            maxLadownosc = 25_000;
         }
         public void OprozniLadunek()
         {
-            masa = WagaWlasna;
+            masaLadunku = WagaWlasna;
         }
-        public void zaladujLadunek(int masaLadunku)
+        public virtual void zaladujLadunek(int masaDoZaladowania)
         {
-            if (masaLadunku + masa <= maxLadownosc)
+            if (masaLadunku + WagaWlasna +masaDoZaladowania  <= maxLadownosc)
             {
-                masa += masaLadunku;
+                masaLadunku += masaDoZaladowania;
             }
             else
             {
@@ -70,9 +70,14 @@ namespace Kontenery
 
     class KontenerNaPlyny : Kontener,IHazardNotifier
     {
-        public KontenerNaPlyny(int masa, int wysokosc, int WagaWlasna, int glebokosc, int maxLadownosc) : base(masa, wysokosc, WagaWlasna, glebokosc,maxLadownosc)
+        public KontenerNaPlyny() : base()
         {
             
+        }
+
+        public override void zaladujLadunek(int masaDoZaladowania)
+        {
+            base.zaladujLadunek(masaDoZaladowania);
         }
         
     }
@@ -81,17 +86,18 @@ namespace Kontenery
     {
         int Pressure { get; set; }
         
-        public KontenernaGaz(int masa, int wysokosc, int WagaWlasna, int glebokosc, int maxLadownosc) : base(masa, wysokosc, WagaWlasna, glebokosc, maxLadownosc)
+        public KontenernaGaz() : base()
         {
             
         }
+        
     }
     class KontenerChlodniczy : Kontener
     {
         private int temp { get;set; }
         private TypProduktu typProdukt { get; set; }
         
-        public KontenerChlodniczy(int masa, int wysokosc, int WagaWlasna, int glebokosc, int maxLadownosc,TypProduktu typProduktu) : base(masa, wysokosc, WagaWlasna, glebokosc, maxLadownosc)
+        public KontenerChlodniczy(TypProduktu typProduktu) : base()
         {
             this.typProdukt = typProduktu;
         }
@@ -117,8 +123,15 @@ namespace kontenerowce
     class Kontenerowiec
     {
         private ArrayList kontenery = new ArrayList();
-        private int predkosc;
+        private int maxpredkosc;
         private int maxiloscKontenerow;
         private int maxLadownosc;
+
+        public Kontenerowiec(int maxpredkosc, int maxiloscKontenerow, int maxLadownosc)
+        {
+            this.maxpredkosc = maxpredkosc;
+            this.maxiloscKontenerow = maxiloscKontenerow;
+            this.maxLadownosc = maxLadownosc;
+        }
     }
 }
