@@ -58,6 +58,15 @@ namespace Kontenery
             }
             return "N";
         }
+
+        public override string ToString()
+        {
+            return "Numer seryjny: "+numerSeryjny+" Masa ladunku: "+masaLadunku;
+        }
+        public string getNumerSeryjny()
+        {
+            return numerSeryjny;
+        }
     }
 
     internal class OverFilledException : Exception
