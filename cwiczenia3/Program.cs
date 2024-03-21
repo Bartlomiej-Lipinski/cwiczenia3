@@ -1,16 +1,50 @@
-﻿using System.Collections;
+﻿using System.Linq.Expressions;
+using Kontenery;
 
 namespace Kontenery
 {
-    abstract class Kontener
+    public abstract class Kontener
     {
         private double masaLadunku;
+        public double GetMasaLadunku()
+        {
+            return masaLadunku;
+        }
+        public void SetMasaLadunku(double value)
+        {
+            masaLadunku = value;
+        }
         private int wysokosc;
         private double WagaWlasna;
+        public double GetWagaWlasna()
+        {
+            return WagaWlasna;
+        }
         private int glebokosc;
         private string numerSeryjny;
+        public String GetNumerSeryjny()
+        {
+            return numerSeryjny;
+        }
         private double maxLadownosc;
+        public double GetmaxLadownosc()
+        {
+            return maxLadownosc;
+        }
+        public void SetmaxLadownosc(double value)
+        {
+            maxLadownosc = value;
+        }
+
         private bool isHazardous;
+        public bool GetIsHazardous()
+        {
+            return isHazardous;
+        }
+        public void SetIsHazardous(bool value)
+        {
+            isHazardous = value;
+        }
 
         public Kontener()
         {
@@ -18,14 +52,14 @@ namespace Kontenery
             wysokosc = 3;
             WagaWlasna = 2350;
             glebokosc = 6;
-            numerSeryjny = "KON-"+establishConType()+"-"+generateSN();
+            numerSeryjny = "KON-"+EstablishConType()+"-"+GenerateSN();
             maxLadownosc = 25_000;
         }
-        public void OprozniLadunek()
+        public virtual void EmptyLoad()
         {
             masaLadunku = WagaWlasna;
         }
-        public virtual void zaladujLadunek(int masaDoZaladowania)
+        public virtual void Load(int masaDoZaladowania)
         {
             if (masaLadunku + WagaWlasna +masaDoZaladowania  <= maxLadownosc)
             {
@@ -33,16 +67,23 @@ namespace Kontenery
             }
             else
             {
-                throw new OverFilledException();
+                try
+                {
+                    throw new OverFilledException();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
             }
         }
 
-        private int generateSN()
+        private int GenerateSN()
         {
              return new Random().Next(1, 9999);
         }
 
-        private string establishConType()
+        private string EstablishConType()
         {
             if (this is KontenerNaPlyny)
             {
@@ -63,9 +104,9 @@ namespace Kontenery
         {
             return "Numer seryjny: "+numerSeryjny+" Masa ladunku: "+masaLadunku;
         }
-        public string getNumerSeryjny()
+        public virtual String GetInfo()
         {
-            return numerSeryjny;
+            return "Numer seryjny: "+numerSeryjny+" Masa ladunku: "+masaLadunku+" Wysokosc: "+wysokosc+" Glebokosc: "+glebokosc+" Waga wlasna: "+WagaWlasna+" Maksymalna ladownosc: "+maxLadownosc+" Czy jest niebezpieczny: "+isHazardous;
         }
     }
 
@@ -79,42 +120,106 @@ namespace Kontenery
 
     class KontenerNaPlyny : Kontener,IHazardNotifier
     {
-        public KontenerNaPlyny() : base()
+        public KontenerNaPlyny(String setHazardus) : base()
         {
-            
+            if (setHazardus == "TAK")
+            {
+                SetIsHazardous(true);
+            }
+            else
+            {
+             SetIsHazardous(false);                
+            }
+
         }
 
-        public override void zaladujLadunek(int masaDoZaladowania)
+        public override void Load(int masaDoZaladowania)
         {
-            base.zaladujLadunek(masaDoZaladowania);
+            if (GetIsHazardous())
+            {
+                SetmaxLadownosc(GetmaxLadownosc() * 0.5);
+            }
+            else
+            {
+                SetmaxLadownosc(GetmaxLadownosc() * 0.9);
+            }
+
+            if (GetMasaLadunku()+GetWagaWlasna()>GetmaxLadownosc())
+            {
+                IHazardNotifier.NotifyHazard(GetNumerSeryjny());
+            }
+            
+            base.Load(masaDoZaladowania);
         }
-        
     }
 
     class KontenernaGaz : Kontener,IHazardNotifier
     {
-        int Pressure { get; set; }
+        private int Pressure;
         
         public KontenernaGaz() : base()
         {
-            
+            Pressure = new Random().Next(1, 100);
         }
-        
+
+        public override void EmptyLoad()
+        {
+            SetMasaLadunku(GetMasaLadunku() * 0.05);
+        }
     }
     class KontenerChlodniczy : Kontener
     {
-        private int temp { get;set; }
+        private double temp;
         private TypProduktu typProdukt { get; set; }
+        
         
         public KontenerChlodniczy(TypProduktu typProduktu) : base()
         {
             this.typProdukt = typProduktu;
+            UstalTemp(typProduktu);
+        }
+
+        private void UstalTemp(TypProduktu typProduktu)
+        {
+            switch (typProduktu)
+            {
+                case TypProduktu.Bananas:
+                    temp = 13.5;
+                    break;
+                case TypProduktu.Chocolate:
+                    temp = 18;
+                    break;
+                case TypProduktu.Fish:
+                    temp = 2;
+                    break;
+                case TypProduktu.Meat:
+                    temp = -15;
+                    break;
+                case TypProduktu.IceCream:
+                    temp = -18;
+                    break;
+                case TypProduktu.FrozenPizza:
+                    temp = -30;
+                    break;
+                case TypProduktu.Cheese:
+                    temp = 7.2;
+                    break;
+                case TypProduktu.Sausages:
+                    temp = 5;
+                    break;
+                case TypProduktu.Butter:
+                    temp = 20.5;
+                    break;
+                case TypProduktu.Eggs:
+                    temp = 19;
+                    break;
+            }
         }
     }
 
     public interface IHazardNotifier
     {
-        private void NotifyHazard(String sn)
+        public static void NotifyHazard(String sn)
         {
             Console.WriteLine("Uwaga! Kontener zawiera materiały niebezpieczne!"+" Numer seryjny: "+sn);
         }
@@ -129,18 +234,41 @@ namespace Kontenery
 
 namespace kontenerowce
 {
-    class Kontenerowiec
+   public class Kontenerowiec
     {
-        private ArrayList kontenery = new ArrayList();
+        public static int number = 0;
+        private string identifikator;
+        private List<Kontener> konteners; 
         private int maxpredkosc;
         private int maxiloscKontenerow;
         private int maxLadownosc;
 
-        public Kontenerowiec(int maxpredkosc, int maxiloscKontenerow, int maxLadownosc)
+        public Kontenerowiec()
         {
-            this.maxpredkosc = maxpredkosc;
-            this.maxiloscKontenerow = maxiloscKontenerow;
-            this.maxLadownosc = maxLadownosc;
+            maxpredkosc = new Random().Next(1,25);
+            maxiloscKontenerow = new Random().Next(10_000,24_000);
+            maxLadownosc = 24_000*25_000;
+            konteners = new List<Kontener>();
+            identifikator = "SHIP-"+number;
+            number++;
+        }
+        public void DodajKonetner(Kontener kontener)
+        {
+            konteners.Add(kontener);
+        }
+
+        public override string ToString()
+        {
+            return "Identyfikator: "+identifikator+" Maksymalna predkosc: "+maxpredkosc+" Maksymalna ilosc kontenerow: "+maxiloscKontenerow+" Maksymalna ladownosc: "+maxLadownosc+" Aktualna ilosc kontenerow: "+konteners.Count;
+        }
+        public String getIdentifikator()
+        {
+            return identifikator;
+        }
+        public List<Kontener> getKonteners()
+        {
+            return konteners;
         }
     }
+    
 }

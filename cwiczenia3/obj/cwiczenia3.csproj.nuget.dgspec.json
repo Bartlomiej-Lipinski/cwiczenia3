@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/Users/bartlomiej_lipinski/APBD/cwiczenia3/cwiczenia3.csproj": {}
+    "E:\\Studia_Sezon_2\\APBD\\cwiczenia3\\cwiczenia3\\cwiczenia3.csproj": {}
   },
   "projects": {
-    "/Users/bartlomiej_lipinski/APBD/cwiczenia3/cwiczenia3.csproj": {
+    "E:\\Studia_Sezon_2\\APBD\\cwiczenia3\\cwiczenia3\\cwiczenia3.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/bartlomiej_lipinski/APBD/cwiczenia3/cwiczenia3.csproj",
+        "projectUniqueName": "E:\\Studia_Sezon_2\\APBD\\cwiczenia3\\cwiczenia3\\cwiczenia3.csproj",
         "projectName": "cwiczenia3",
-        "projectPath": "/Users/bartlomiej_lipinski/APBD/cwiczenia3/cwiczenia3.csproj",
-        "packagesPath": "/Users/bartlomiej_lipinski/.nuget/packages/",
-        "outputPath": "/Users/bartlomiej_lipinski/APBD/cwiczenia3/obj/",
+        "projectPath": "E:\\Studia_Sezon_2\\APBD\\cwiczenia3\\cwiczenia3\\cwiczenia3.csproj",
+        "packagesPath": "C:\\Users\\rochm\\.nuget\\packages\\",
+        "outputPath": "E:\\Studia_Sezon_2\\APBD\\cwiczenia3\\cwiczenia3\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/bartlomiej_lipinski/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\rochm\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -53,7 +53,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
