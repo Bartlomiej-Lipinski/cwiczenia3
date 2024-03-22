@@ -1,12 +1,12 @@
-﻿using kontenerowce;
-using Kontenery;
+﻿using ContainerShips;
+using Containers;
 
 namespace cwiczenia3;
 
 public class Consola
 {
-        static List<Kontener> kontenery = new List<Kontener>();
-        static List<Kontenerowiec> kontenerowce = new List<Kontenerowiec>();
+        static List<Container> _containers = new List<Container>();
+        static List<ContainerShip> _containerShips = new List<ContainerShip>();
     public static void Main(string[] args)
     {
         while (true)
@@ -18,7 +18,7 @@ public class Consola
         }
     }
 
-    public static void DodajKontener()
+    public static void AddContainer()
     {
         Console.WriteLine("1. Kontener na plyny");
         Console.WriteLine("2. Kontener na gaz");
@@ -28,16 +28,16 @@ public class Consola
         {
             case 1 :
                 Console.WriteLine("czy produkt jest niebezpieczny? (TAK/NIE)");
-                string czyNiebezpieczny = Console.ReadLine();
-                KontenerNaPlyny kontener = new KontenerNaPlyny(czyNiebezpieczny);
-                kontenery.Add(kontener);
+                string isHazardous = Console.ReadLine();
+                LiquidContainer liquidContainer = new LiquidContainer(isHazardous);
+                _containers.Add(liquidContainer);
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("utworzono Kontener na plyny");
                 Console.ResetColor();
                 break;
             case 2 : 
-                KontenernaGaz kontenerGaz = new KontenernaGaz();
-                kontenery.Add(kontenerGaz);
+                ContainerForGas gasContainer = new ContainerForGas();
+                _containers.Add(gasContainer);
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("utworzono Kontener na gaz");
                 Console.ResetColor();
@@ -47,16 +47,16 @@ public class Consola
                 Console.WriteLine("Wybierz typ produktu:");
                 for (int i = 0; i < 10; i++)
                 {
-                    Console.WriteLine($"{i+1}. {Enum.GetName(typeof(TypProduktu), i)}");
+                    Console.WriteLine($"{i+1}. {Enum.GetName(typeof(ProductType), i)}");
                 }
                 int choice2;
                 while (!int.TryParse(Console.ReadLine(), out choice2) || choice2 < 1 || choice2 > 10)
                 {
                     Console.WriteLine("Invalid choice. Please enter a number between 1 and 10:");
                 }
-                TypProduktu typProduktu = (TypProduktu)choice2;  
-                KontenerChlodniczy kontenerChlodniczy = new KontenerChlodniczy(typProduktu);
-                kontenery.Add(kontenerChlodniczy);
+                ProductType productType = (ProductType)choice2;  
+                ContainerWithFreezer containerWithFreezer = new ContainerWithFreezer(productType);
+                _containers.Add(containerWithFreezer);
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("utworzono Kontener chlodniczy");
                 Console.ResetColor();
@@ -65,7 +65,7 @@ public class Consola
         }
     }
 
-    public static void FunkcjeKontenera(Kontener kontener)
+    public static void ContainerFunctions(Container container)
     {
         Console.WriteLine("wybierz akcje:");
         Console.WriteLine("1. wyświetl informacje o kontenerze");
@@ -79,107 +79,107 @@ public class Consola
         switch (choice)
         {
             case 1:
-                Console.WriteLine(kontener.GetInfo());
+                Console.WriteLine(container.GetInfo());
                 break;
             case 2:
                 Console.WriteLine("Podaj mase do zaladowania");
                 int.TryParse(Console.ReadLine(), out int masaDoZaladowania);
-                kontener.Load(masaDoZaladowania);
+                container.Load(masaDoZaladowania);
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Kontener załadowany");
                 Console.ResetColor();
                 break;
             case 3:
-                kontener.EmptyLoad();
+                container.EmptyLoad();
                 break;
             case 4:
-               Kontenerowiec kontenerowiec = WybierzKontenerowiec();
-                if (kontenerowiec != null)
+               ContainerShip containerShip = ChoseContainerShip();
+                if (containerShip != null)
                 {
-                    kontenerowiec.getKonteners().Add(kontener);
+                    containerShip.GetContainers().Add(container);
                 }
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Kontener załadowany na statek");
                 Console.ResetColor();
                 break;
             case 5:
-                kontenerowiec = WybierzKontenerowiec();
-                if (kontenerowiec != null)
+                containerShip = ChoseContainerShip();
+                if (containerShip != null)
                 {
-                    kontenerowiec.getKonteners().Remove(kontener);
+                    containerShip.GetContainers().Remove(container);
                 }
-                Kontenerowiec kontenerowiec2 = WybierzKontenerowiec();
-                if (kontenerowiec2 != null)
+                ContainerShip containerShip2 = ChoseContainerShip();
+                if (containerShip2 != null)
                 {
-                    kontenerowiec2.getKonteners().Add(kontener);
+                    containerShip2.GetContainers().Add(container);
                 }
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Kontener przeładowany ze statku na statek");
                 Console.ResetColor();
                 break;
             case 6:
-                kontenerowiec = WybierzKontenerowiec();
-                if (kontenerowiec != null)
+                containerShip = ChoseContainerShip();
+                if (containerShip != null)
                 {
-                    kontenerowiec.getKonteners().Add(kontener);
-                    kontenery.Remove(kontener);
+                    containerShip.GetContainers().Add(container);
+                    _containers.Remove(container);
                 }
                 break;
             case 7:
                 return;
         }
     }
-    public static Kontenerowiec WybierzKontenerowiec()
+    public static ContainerShip ChoseContainerShip()
     {
         Console.WriteLine("Podaj identyfikator kontenerowca");
-        foreach (Kontenerowiec kontenerowiec in kontenerowce)
+        foreach (ContainerShip containerShip in _containerShips)
         {
-            Console.WriteLine(kontenerowiec.getIdentifikator());
+            Console.WriteLine(containerShip.GetIdentifikator());
         }
-        string numerSeryjny = Console.ReadLine();
-        foreach (var kontenerowiec in kontenerowce)
+        string serialNumber = Console.ReadLine();
+        foreach (var choseContainerShip in _containerShips)
         {
-            if (kontenerowiec.getIdentifikator() == numerSeryjny)
+            if (choseContainerShip.GetIdentifikator() == serialNumber)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Znaleziono kontenerowiec o podanym numerze seryjnym");
                 Console.ResetColor();
-                return kontenerowiec;
+                return choseContainerShip;
             }
         }
         Console.WriteLine("Nie znaleziono kontenera o podanym numerze seryjnym");
         return null;
     }
-    public static void WyswietlKontenery()
+    public static void DisplayExistingContainers()
     {
-        foreach (var kontener in kontenery)
+        foreach (var kontener in _containers)
         {
             Console.WriteLine(kontener);
         }
     }
-    public static Kontener WybierzKontener()
+    public static Container ChoseContainer()
     {
         Console.WriteLine("Podaj numer seryjny kontenera");
-        string numerSeryjny = Console.ReadLine();
-        foreach (var kontener in kontenery)
+        string serialNumber = Console.ReadLine();
+        foreach (var choseContainer in _containers)
         {
-            if (kontener.GetNumerSeryjny() == numerSeryjny)
+            if (choseContainer.GetSerialNumber() == serialNumber)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Znaleziono kontener o podanym numerze seryjnym");
                 Console.ResetColor();
-                return kontener;
+                return choseContainer;
             }
         }
         Console.WriteLine("Nie znaleziono kontenera o podanym numerze seryjnym");
         return null;
     }
-    public static void DodajKontenerowiec()
+    public static void AddContainerShip()
     {
-        Kontenerowiec kontenerowiec = new Kontenerowiec();
-        kontenerowce.Add(kontenerowiec);
+        ContainerShip containerShip = new ContainerShip();
+        _containerShips.Add(containerShip);
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine("Dodano kontenerowiec: "+kontenerowiec.getIdentifikator());
+        Console.WriteLine("Dodano kontenerowiec: "+containerShip.GetIdentifikator());
         Console.ResetColor();
     }
     public static bool Menu()
@@ -197,68 +197,68 @@ public class Consola
         switch (choice)
         {
             case 1:
-                DodajKontener();
+                AddContainer();
                 break;
             case 2:
-                WyswietlKontenery();
+                DisplayExistingContainers();
                 break;
             case 3:
                 Console.WriteLine("wybierz kilka kontenerow do zaladowania na statek");
-                WyswietlKontenery();
-                List<Kontener> konteners = new List<Kontener>();
-                int iloscKontenerow = 0;
-                Kontener kontenerDoDodania = WybierzKontener();
-                konteners.Add(kontenerDoDodania);
-                iloscKontenerow++;
+                DisplayExistingContainers();
+                List<Container> containers = new List<Container>();
+                int contenerCount = 0;
+                Container containerToAdd = ChoseContainer();
+                containers.Add(containerToAdd);
+                contenerCount++;
                 Console.WriteLine("czy chcesz dodac kolejny kontener? (TAK/NIE)");
-                string czyDodacKolejny = Console.ReadLine();
-                while (czyDodacKolejny == "TAK")
+                string ifContinue = Console.ReadLine();
+                while (ifContinue == "TAK")
                 {
-                    kontenerDoDodania = WybierzKontener();
-                    konteners.Add(kontenerDoDodania);
-                    iloscKontenerow++;
+                    containerToAdd = ChoseContainer();
+                    containers.Add(containerToAdd);
+                    contenerCount++;
                     Console.WriteLine("czy chcesz dodac kolejny kontener? (TAK/NIE)");
-                    czyDodacKolejny = Console.ReadLine();
+                    ifContinue = Console.ReadLine();
                 }
                 Console.WriteLine("Podaj identyfikator kontenerowca");
-                foreach (Kontenerowiec kontenerowiec in kontenerowce)
+                foreach (ContainerShip containerShip in _containerShips)
                 {
-                    Console.WriteLine(kontenerowiec.getIdentifikator());
+                    Console.WriteLine(containerShip.GetIdentifikator());
                 }
-                string identyfikator = Console.ReadLine();
-                foreach (var kontenerowiec in kontenerowce)
+                string identificator = Console.ReadLine();
+                foreach (var containerShip in _containerShips)
                 {
-                    if (kontenerowiec.getIdentifikator() == identyfikator)
+                    if (containerShip.GetIdentifikator() == identificator)
                     {
-                        foreach (var kontener in konteners)
+                        foreach (var container in containers)
                         {
-                            kontenerowiec.getKonteners().Add(kontener);
+                            containerShip.GetContainers().Add(container);
                         }
                     }
                 }
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Kontenery dodane na statek: "+iloscKontenerow);
+                Console.WriteLine("Kontenery dodane na statek: "+contenerCount);
                 Console.ResetColor();
                 break;
             case 4:
-                 DodajKontenerowiec();
+                 AddContainerShip();
                 break;
             case 5:
-                foreach (var kontenerowiec in kontenerowce)
+                foreach (var containerShip in _containerShips)
                 {
-                    Console.WriteLine(kontenerowiec);
+                    Console.WriteLine(containerShip);
                 }
                 break;
             case 6:
                 Console.WriteLine("Podaj numer seryjny kontenera do usuniecia");
-                string numerSeryjny = Console.ReadLine();
-                foreach (var kontenerowiec in kontenerowce)
+                string serialNumber = Console.ReadLine();
+                foreach (var containerShip in _containerShips)
                 {
-                    foreach (var kontener in kontenerowiec.getKonteners())
+                    foreach (var container in containerShip.GetContainers())
                     {
-                        if (kontener.GetNumerSeryjny() == numerSeryjny)
+                        if (container.GetSerialNumber() == serialNumber)
                         {
-                            kontenerowiec.getKonteners().Remove(kontener);
+                            containerShip.GetContainers().Remove(container);
                             Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine("usunieto kontener");
                             Console.ResetColor();
@@ -270,8 +270,8 @@ public class Consola
                 Console.ResetColor();
                 break;
             case 7:
-                WyswietlKontenery();
-                FunkcjeKontenera(WybierzKontener());
+                DisplayExistingContainers();
+                ContainerFunctions(ChoseContainer());
                 break;
             case 8:
                 return false;

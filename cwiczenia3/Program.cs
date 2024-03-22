@@ -1,69 +1,81 @@
-﻿using System.Linq.Expressions;
-using Kontenery;
+﻿using Containers;
 
-namespace Kontenery
+namespace Containers
 {
-    public abstract class Kontener
+    public abstract class Container
     {
-        private double masaLadunku;
-        public double GetMasaLadunku()
+        private double _cargoMass;
+
+        public double GetCargoMass()
         {
-            return masaLadunku;
-        }
-        public void SetMasaLadunku(double value)
-        {
-            masaLadunku = value;
-        }
-        private int wysokosc;
-        private double WagaWlasna;
-        public double GetWagaWlasna()
-        {
-            return WagaWlasna;
-        }
-        private int glebokosc;
-        private string numerSeryjny;
-        public String GetNumerSeryjny()
-        {
-            return numerSeryjny;
-        }
-        private double maxLadownosc;
-        public double GetmaxLadownosc()
-        {
-            return maxLadownosc;
-        }
-        public void SetmaxLadownosc(double value)
-        {
-            maxLadownosc = value;
+            return _cargoMass;
         }
 
-        private bool isHazardous;
+        public void SetCargoMass(double value)
+        {
+            _cargoMass = value;
+        }
+
+        private int _highth;
+        private double _containerOwnMass;
+
+        public double GetContainerOwnMass()
+        {
+            return _containerOwnMass;
+        }
+
+        private int _depth;
+        private string _serialNumber;
+
+        public String GetSerialNumber()
+        {
+            return _serialNumber;
+        }
+
+        private double _maxLoad;
+
+        public double GetMaxLoad()
+        {
+            return _maxLoad;
+        }
+
+        public void SetMaxLoad(double value)
+        {
+            _maxLoad = value;
+        }
+
+        private bool _isHazardous;
+
         public bool GetIsHazardous()
         {
-            return isHazardous;
-        }
-        public void SetIsHazardous(bool value)
-        {
-            isHazardous = value;
+            return _isHazardous;
         }
 
-        public Kontener()
+        public void SetIsHazardous(bool value)
         {
-            masaLadunku = WagaWlasna + masaLadunku ;
-            wysokosc = 3;
-            WagaWlasna = 2350;
-            glebokosc = 6;
-            numerSeryjny = "KON-"+EstablishConType()+"-"+GenerateSN();
-            maxLadownosc = 25_000;
+            _isHazardous = value;
         }
+
+        public Container()
+        {
+            _cargoMass = _containerOwnMass + _cargoMass;
+            _highth = 3;
+            _containerOwnMass = 2350;
+            _depth = 6;
+            _serialNumber = "KON-" + EstablishConType() + "-" + GenerateSn();
+            _maxLoad = 25_000;
+        }
+
         public virtual void EmptyLoad()
         {
-            masaLadunku = WagaWlasna;
+            _cargoMass = _containerOwnMass;
         }
-        public virtual void Load(int masaDoZaladowania)
+
+        public virtual void Load(int massToLoad)
         {
-            if (masaLadunku + WagaWlasna +masaDoZaladowania  <= maxLadownosc)
+            if (_cargoMass + _containerOwnMass + massToLoad <= _maxLoad)
             {
-                masaLadunku += masaDoZaladowania;
+                _cargoMass += massToLoad;
             }
             else
             {
@@ -78,35 +90,41 @@ namespace Kontenery
             }
         }
 
-        private int GenerateSN()
+        private int GenerateSn()
         {
-             return new Random().Next(1, 9999);
+            return new Random().Next(1, 9999);
         }
 
         private string EstablishConType()
         {
-            if (this is KontenerNaPlyny)
+            if (this is LiquidContainer)
             {
-                 return "L";
+                return "L";
             }
-            if (this is KontenernaGaz)
+
+            if (this is ContainerForGas)
             {
                 return "G";
             }
-            if (this is KontenerChlodniczy)
+
+            if (this is ContainerWithFreezer)
             {
                 return "C";
             }
+
             return "N";
         }
 
         public override string ToString()
         {
-            return "Numer seryjny: "+numerSeryjny+" Masa ladunku: "+masaLadunku;
+            return "Numer seryjny: " + _serialNumber + " Masa ladunku: " + _cargoMass;
         }
+
         public virtual String GetInfo()
         {
-            return "Numer seryjny: "+numerSeryjny+" Masa ladunku: "+masaLadunku+" Wysokosc: "+wysokosc+" Glebokosc: "+glebokosc+" Waga wlasna: "+WagaWlasna+" Maksymalna ladownosc: "+maxLadownosc+" Czy jest niebezpieczny: "+isHazardous;
+            return "Numer seryjny: " + _serialNumber + " Masa ladunku: " + _cargoMass + " Wysokosc: " + _highth +
+                   " Glebokosc: " + _depth + " Waga wlasna: " + _containerOwnMass + " Maksymalna ladownosc: " +
+                   _maxLoad + " Czy jest niebezpieczny: " + _isHazardous;
         }
     }
 
@@ -118,9 +136,9 @@ namespace Kontenery
         }
     }
 
-    class KontenerNaPlyny : Kontener,IHazardNotifier
+    public class LiquidContainer : Container, IHazardNotifier
     {
-        public KontenerNaPlyny(String setHazardus) : base()
+        public LiquidContainer(String setHazardus) : base()
         {
             if (setHazardus == "TAK")
             {
@@ -128,92 +146,97 @@ namespace Kontenery
             }
             else
             {
-             SetIsHazardous(false);                
+                SetIsHazardous(false);
             }
-
         }
 
-        public override void Load(int masaDoZaladowania)
+        public override void Load(int massToLoad)
         {
             if (GetIsHazardous())
             {
-                SetmaxLadownosc(GetmaxLadownosc() * 0.5);
+                SetMaxLoad(GetMaxLoad() * 0.5);
             }
             else
             {
-                SetmaxLadownosc(GetmaxLadownosc() * 0.9);
+                SetMaxLoad(GetMaxLoad() * 0.9);
             }
 
-            if (GetMasaLadunku()+GetWagaWlasna()>GetmaxLadownosc())
+            if (GetCargoMass() + GetContainerOwnMass() > GetMaxLoad())
             {
-                IHazardNotifier.NotifyHazard(GetNumerSeryjny());
+                IHazardNotifier.NotifyHazard(GetSerialNumber());
             }
-            
-            base.Load(masaDoZaladowania);
+
+            base.Load(massToLoad);
         }
     }
 
-    class KontenernaGaz : Kontener,IHazardNotifier
+    public class ContainerForGas : Container, IHazardNotifier
     {
         private int Pressure;
-        
-        public KontenernaGaz() : base()
+
+        public ContainerForGas() : base()
         {
             Pressure = new Random().Next(1, 100);
         }
 
         public override void EmptyLoad()
         {
-            SetMasaLadunku(GetMasaLadunku() * 0.05);
+            SetCargoMass(GetCargoMass() * 0.05);
         }
     }
-    class KontenerChlodniczy : Kontener
+
+    public class ContainerWithFreezer : Container
     {
-        private double temp;
-        private TypProduktu typProdukt { get; set; }
-        
-        
-        public KontenerChlodniczy(TypProduktu typProduktu) : base()
+        private double _temp;
+        private ProductType _productType { get; set; }
+
+
+        public ContainerWithFreezer(ProductType _productType) : base()
         {
-            this.typProdukt = typProduktu;
-            UstalTemp(typProduktu);
+            this._productType = _productType;
+            EstablishTemp(_productType);
         }
 
-        private void UstalTemp(TypProduktu typProduktu)
+        private void EstablishTemp(ProductType productType)
         {
-            switch (typProduktu)
+            switch (productType)
             {
-                case TypProduktu.Bananas:
-                    temp = 13.5;
+                case ProductType.Bananas:
+                    _temp = 13.5;
                     break;
-                case TypProduktu.Chocolate:
-                    temp = 18;
+                case ProductType.Chocolate:
+                    _temp = 18;
                     break;
-                case TypProduktu.Fish:
-                    temp = 2;
+                case ProductType.Fish:
+                    _temp = 2;
                     break;
-                case TypProduktu.Meat:
-                    temp = -15;
+                case ProductType.Meat:
+                    _temp = -15;
                     break;
-                case TypProduktu.IceCream:
-                    temp = -18;
+                case ProductType.IceCream:
+                    _temp = -18;
                     break;
-                case TypProduktu.FrozenPizza:
-                    temp = -30;
+                case ProductType.FrozenPizza:
+                    _temp = -30;
                     break;
-                case TypProduktu.Cheese:
-                    temp = 7.2;
+                case ProductType.Cheese:
+                    _temp = 7.2;
                     break;
-                case TypProduktu.Sausages:
-                    temp = 5;
+                case ProductType.Sausages:
+                    _temp = 5;
                     break;
-                case TypProduktu.Butter:
-                    temp = 20.5;
+                case ProductType.Butter:
+                    _temp = 20.5;
                     break;
-                case TypProduktu.Eggs:
-                    temp = 19;
+                case ProductType.Eggs:
+                    _temp = 19;
                     break;
             }
+        }
+
+        public String GetInfo()
+        {
+            return base.GetInfo() + " Temperatura: " + _temp + " Typ produktu: " + _productType;
         }
     }
 
@@ -221,54 +244,66 @@ namespace Kontenery
     {
         public static void NotifyHazard(String sn)
         {
-            Console.WriteLine("Uwaga! Kontener zawiera materiały niebezpieczne!"+" Numer seryjny: "+sn);
+            Console.WriteLine("Uwaga! Kontener zawiera materiały niebezpieczne!" + " Numer seryjny: " + sn);
         }
     }
 
-    enum TypProduktu
+    public enum ProductType
     {
-        Bananas,Chocolate,Fish,Meat,IceCream,FrozenPizza,Cheese,Sausages,Butter,Eggs
+        Bananas,
+        Chocolate,
+        Fish,
+        Meat,
+        IceCream,
+        FrozenPizza,
+        Cheese,
+        Sausages,
+        Butter,
+        Eggs
     }
-    
 }
 
-namespace kontenerowce
+namespace ContainerShips
 {
-   public class Kontenerowiec
+    public class ContainerShip
     {
         public static int number = 0;
-        private string identifikator;
-        private List<Kontener> konteners; 
-        private int maxpredkosc;
-        private int maxiloscKontenerow;
-        private int maxLadownosc;
+        private string _Identifikator;
+        private List<Container> _containers;
+        private int _maxSpeed;
+        private int _maxContainerOnBoard;
+        private int _maxLoad;
 
-        public Kontenerowiec()
+        public ContainerShip()
         {
-            maxpredkosc = new Random().Next(1,25);
-            maxiloscKontenerow = new Random().Next(10_000,24_000);
-            maxLadownosc = 24_000*25_000;
-            konteners = new List<Kontener>();
-            identifikator = "SHIP-"+number;
+            _maxSpeed = new Random().Next(1, 25);
+            _maxContainerOnBoard = new Random().Next(10_000, 24_000);
+            _maxLoad = 24_000 * 25_000;
+            _containers = new List<Container>();
+            _Identifikator = "SHIP-" + number;
             number++;
         }
-        public void DodajKonetner(Kontener kontener)
+
+        public void AddContainer(Container container)
         {
-            konteners.Add(kontener);
+            _containers.Add(container);
         }
 
         public override string ToString()
         {
-            return "Identyfikator: "+identifikator+" Maksymalna predkosc: "+maxpredkosc+" Maksymalna ilosc kontenerow: "+maxiloscKontenerow+" Maksymalna ladownosc: "+maxLadownosc+" Aktualna ilosc kontenerow: "+konteners.Count;
+            return "Identyfikator: " + _Identifikator + " Maksymalna predkosc: " + _maxSpeed +
+                   " Maksymalna ilosc kontenerow: " + _maxContainerOnBoard + " Maksymalna ladownosc: " + _maxLoad +
+                   " Aktualna ilosc kontenerow: " + _containers.Count;
         }
-        public String getIdentifikator()
+
+        public String GetIdentifikator()
         {
-            return identifikator;
+            return _Identifikator;
         }
-        public List<Kontener> getKonteners()
+
+        public List<Container> GetContainers()
         {
-            return konteners;
+            return _containers;
         }
     }
-    
 }
